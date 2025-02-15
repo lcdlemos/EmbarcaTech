@@ -12,8 +12,10 @@
 #include "botao.c"
 #include "pulsos.c"
 
-#define WIFI_SSID "LIGHT SIDE"
-#define WIFI_PASS "AnakinSkywalker13"
+#define WIFI_SSID "AP_401"
+#define WIFI_PASS "Claro@2025"
+//#define WIFI_SSID "LIGHT SIDE"
+//#define WIFI_PASS "AnakinSkywalker13"
 #define THINGSPEAK_HOST "api.thingspeak.com"
 #define THINGSPEAK_PORT 80
 
@@ -40,14 +42,13 @@ static err_t http_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err)
         return err;
     }
 
-    printf("Conectado ao ThingSpeak!\n");
+    printf("\nConectado ao ThingSpeak!\n");
 
-    //int pulsos = conta_pulsos();  // Lê a temperatura
-   
     int pulsos = conta_pulsos();
+
     char request[256];
     snprintf(request, sizeof(request),
-        "GET /update?api_key=%s&field1=%i HTTP/1.1\r\n"
+        "GET /update?api_key=%s&field1=%d HTTP/1.1\r\n"
         "Host: %s\r\n"
         "Connection: close\r\n"
         "\r\n",
@@ -63,11 +64,11 @@ static err_t http_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err)
 // Resolver DNS e conectar ao servidor
 static void dns_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg) {
     if (ipaddr) {
-        printf("Endereço IP do ThingSpeak: %s\n", ipaddr_ntoa(ipaddr));
+        printf("\nEndereço IP do ThingSpeak: %s\n", ipaddr_ntoa(ipaddr));
         tcp_client_pcb = tcp_new();
         tcp_connect(tcp_client_pcb, ipaddr, THINGSPEAK_PORT, http_connected_callback);
     } else {
-        printf("Falha na resolução de DNS\n");
+        printf("\nFalha na resolução de DNS\n");
     }
 }
 
@@ -87,29 +88,28 @@ int main() {
     sleep_ms(100);
 
     if (cyw43_arch_init()) {
-        printf("Falha ao iniciar Wi-Fi\n");
+        printf("\nFalha ao iniciar Wi-Fi\n");
         return 1;
     }
 
     espera_wifi();
 
     cyw43_arch_enable_sta_mode();
-    printf("Conectando ao Wi-Fi...\n");
+    printf("\nConectando ao Wi-Fi...\n");
 
     if (cyw43_arch_wifi_connect_blocking(WIFI_SSID, WIFI_PASS, CYW43_AUTH_WPA2_MIXED_PSK)) {
-        printf("Falha ao conectar ao Wi-Fi\n");
+        printf("\nFalha ao conectar ao Wi-Fi\n");
         return 1;
     }
 
     conectado_wifi();
-    printf("Wi-Fi conectado!\n");
+    printf("\nWi-Fi conectado!\n");
 
-    espera_contagem();
-    //conta_pulsos();
-
+    //espera_contagem();
+    
     while(true){
         dns_gethostbyname(THINGSPEAK_HOST, &server_ip, dns_callback, NULL);
-        sleep_ms(60000);  // Espera 30 segundos antes de enviar novamente
+        sleep_ms(30000);  // Espera 30 segundos antes de enviar novamente
     }        
     return 0;
 }
