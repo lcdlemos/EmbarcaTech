@@ -38,7 +38,7 @@ void intro(){
 
     //
     ssd1306_draw_string(ssd, 5, 10, "   Bem Vinda");
-    ssd1306_draw_string(ssd, 5, 32, "  Programa de");
+    ssd1306_draw_string(ssd, 5, 32, "   Sistema de");
     ssd1306_draw_string(ssd, 5, 40, " Monitoramento");
     ssd1306_draw_string(ssd, 5, 48, "  de Contracao");
     render_on_display(ssd, &frame_area);

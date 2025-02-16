@@ -12,14 +12,14 @@
 #include "botao.c"
 #include "pulsos.c"
 
-#define WIFI_SSID "AP_401"
-#define WIFI_PASS "Claro@2025"
-//#define WIFI_SSID "LIGHT SIDE"
-//#define WIFI_PASS "AnakinSkywalker13"
+// WIFI_SSID deve ser susbtituído pela ID da rede WIFI utilizada
+// WIFI_PASS deve ser alterado pela senha da rede WIFI utilizada
+#define WIFI_SSID "WIFI_SSID"
+#define WIFI_PASS "WIFI_PASS"
 #define THINGSPEAK_HOST "api.thingspeak.com"
 #define THINGSPEAK_PORT 80
 
-#define API_KEY "31Y51JU2F6713Z2P"  // Chave de escrita do ThingSpeak
+#define API_KEY "31Y51JU2F6713Z2P"                      // Chave de escrita do ThingSpeak
 
 struct tcp_pcb *tcp_client_pcb;
 ip_addr_t server_ip;
@@ -73,7 +73,7 @@ static void dns_callback(const char *name, const ip_addr_t *ipaddr, void *callba
 }
 
 int main() {
-    stdio_init_all();
+    stdio_init_all();                                   //Inicializa todas entradas PIO da placa
 
     display_init();                                     //Inicializa o display OLED
     leds_init();                                        //Inicializa os LEDs
@@ -82,35 +82,32 @@ int main() {
     buzzer();                                           //Sinal sonoro indicando inicio do programa
     sleep_ms(1500);
     
-    espera();
+    espera();                                           //Imprime a mensagem de espera do botão pressionado para continuar
 
-    botao();
+    botao();                                            //VErifica se o botão foi rpesisonado para o programa seguir a execução
     sleep_ms(100);
 
     if (cyw43_arch_init()) {
-        printf("\nFalha ao iniciar Wi-Fi\n");
+        printf("\nFalha ao iniciar Wi-Fi\n");           //Informa que não foi possível conectar a WiFi
         return 1;
     }
 
-    espera_wifi();
+    espera_wifi();                                      //Exibe no display mensagem que esta conetando ao wifi
 
     cyw43_arch_enable_sta_mode();
-    printf("\nConectando ao Wi-Fi...\n");
+    printf("\nConectando ao Wi-Fi...\n");               //Exibe no terminal mensagem que esta conectadno ao wifi em concordancia com a mensagem do display
 
     if (cyw43_arch_wifi_connect_blocking(WIFI_SSID, WIFI_PASS, CYW43_AUTH_WPA2_MIXED_PSK)) {
         printf("\nFalha ao conectar ao Wi-Fi\n");
         return 1;
     }
 
-    conectado_wifi();
+    conectado_wifi();                                   //Informa no display que o wifi foi conectado
     printf("\nWi-Fi conectado!\n");
 
-    //espera_contagem();
-    
-    while(true){
+    while(true){                                        // Programa executa indefinidamente até ser dsligado
         dns_gethostbyname(THINGSPEAK_HOST, &server_ip, dns_callback, NULL);
-        sleep_ms(30000);  // Espera 30 segundos antes de enviar novamente
+        sleep_ms(15000);  // Espera 60 segundos antes de enviar novamente
     }        
     return 0;
 }
-
